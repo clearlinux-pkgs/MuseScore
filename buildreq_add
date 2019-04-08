@@ -1,0 +1,8 @@
+# This file contains additional build requirements that did not get
+# picked up automatically. One name per line, no whitespace.
+libsndfile-dev
+libvorbis-dev
+qtsvg-dev
+qttools-dev
+qtwebengine-dev
+qtxmlpatterns-dev
