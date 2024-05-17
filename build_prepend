@@ -1,0 +1,2 @@
+# no prebuilt binaries
+rm -f src/diagnostics/crashpad_handler/linux/x86-64/crashpad_handler  
