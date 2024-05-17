@@ -7,7 +7,7 @@
 #
 Name     : MuseScore
 Version  : 4.3.0
-Release  : 17
+Release  : 18
 URL      : https://github.com/musescore/MuseScore/archive/v4.3.0/MuseScore-4.3.0.tar.gz
 Source0  : https://github.com/musescore/MuseScore/archive/v4.3.0/MuseScore-4.3.0.tar.gz
 Summary  : Shared and static libraries for LAME.
@@ -112,7 +112,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1715981261
+export SOURCE_DATE_EPOCH=1715984718
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -165,7 +165,7 @@ FFLAGS="$CLEAR_INTERMEDIATE_FFLAGS"
 FCFLAGS="$CLEAR_INTERMEDIATE_FCFLAGS"
 ASFLAGS="$CLEAR_INTERMEDIATE_ASFLAGS"
 LDFLAGS="$CLEAR_INTERMEDIATE_LDFLAGS"
-export SOURCE_DATE_EPOCH=1715981261
+export SOURCE_DATE_EPOCH=1715984718
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/MuseScore
 cp %{_builddir}/MuseScore-%{version}/LICENSE.txt %{buildroot}/usr/share/package-licenses/MuseScore/c6cdea5f044c95b68a1a36d69f81fff23474f9c1 || :

@@ -1,12 +1,28 @@
-From f21d71ce8ea1d790dafeee5b85221068c2686617 Mon Sep 17 00:00:00 2001
+From b494f8ae61d9ef9ce0618d8cb3117cefe6a386b5 Mon Sep 17 00:00:00 2001
 From: "Brett T. Warden" <brett.t.warden@intel.com>
 Date: Fri, 17 May 2024 13:48:14 -0700
 Subject: [PATCH] Don't install the crashpad_handler
 
 ---
+ src/app/main.cpp               | 4 ----
  src/diagnostics/CMakeLists.txt | 1 -
- 1 file changed, 1 deletion(-)
+ 2 files changed, 5 deletions(-)
 
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index 3120a8810cdc..aa4068157579 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -226,10 +226,6 @@ int main(int argc, char** argv)
+ 
+     mu::app::App app;
+ 
+-    //! NOTE `diagnostics` must be first, because it installs the crash handler.
+-    //! For other modules, the order is (an should be) unimportant.
+-    app.addModule(new mu::diagnostics::DiagnosticsModule());
+-
+     // framework
+     app.addModule(new mu::accessibility::AccessibilityModule());
+     app.addModule(new mu::actions::ActionsModule());
 diff --git a/src/diagnostics/CMakeLists.txt b/src/diagnostics/CMakeLists.txt
 index 878a5ab0d66f..08295377c651 100644
 --- a/src/diagnostics/CMakeLists.txt
