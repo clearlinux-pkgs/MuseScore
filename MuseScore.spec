@@ -7,7 +7,7 @@
 #
 Name     : MuseScore
 Version  : 4.3.0
-Release  : 16
+Release  : 17
 URL      : https://github.com/musescore/MuseScore/archive/v4.3.0/MuseScore-4.3.0.tar.gz
 Source0  : https://github.com/musescore/MuseScore/archive/v4.3.0/MuseScore-4.3.0.tar.gz
 Summary  : Shared and static libraries for LAME.
@@ -24,6 +24,7 @@ BuildRequires : doxygen
 BuildRequires : freetype-dev
 BuildRequires : git
 BuildRequires : glibc-dev
+BuildRequires : googletest-dev
 BuildRequires : libpng-dev
 BuildRequires : libsndfile-dev
 BuildRequires : libvorbis-dev
@@ -56,6 +57,7 @@ BuildRequires : zlib-dev
 # Suppress stripping binaries
 %define __strip /bin/true
 %define debug_package %{nil}
+Patch1: 0001-Don-t-install-the-crashpad_handler.patch
 
 %description
 LAME is an educational tool to be used for learning about MP3 encoding.  The
@@ -80,18 +82,6 @@ Group: Data
 data components for the MuseScore package.
 
 
-%package dev
-Summary: dev components for the MuseScore package.
-Group: Development
-Requires: MuseScore-bin = %{version}-%{release}
-Requires: MuseScore-data = %{version}-%{release}
-Provides: MuseScore-devel = %{version}-%{release}
-Requires: MuseScore = %{version}-%{release}
-
-%description dev
-dev components for the MuseScore package.
-
-
 %package license
 Summary: license components for the MuseScore package.
 Group: Default
@@ -111,13 +101,18 @@ man components for the MuseScore package.
 %prep
 %setup -q -n MuseScore-4.3.0
 cd %{_builddir}/MuseScore-4.3.0
+%patch -P 1 -p1
 
 %build
+## build_prepend content
+# no prebuilt binaries
+rm -f src/diagnostics/crashpad_handler/linux/x86-64/crashpad_handler
+## build_prepend end
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1715962871
+export SOURCE_DATE_EPOCH=1715981261
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -135,14 +130,15 @@ FCFLAGS="$CLEAR_INTERMEDIATE_FCFLAGS"
 ASFLAGS="$CLEAR_INTERMEDIATE_ASFLAGS"
 LDFLAGS="$CLEAR_INTERMEDIATE_LDFLAGS"
 export GOAMD64=v2
-%cmake .. -DBUILD_WEBENGINE=OFF \
--DUSE_SYSTEM_FREETYPE=ON \
--DBUILD_LAME=OFF \
--DBUILD_JACK=OFF \
--DBUILD_PORTMIDI=OFF \
--DBUILD_PCH=OFF \
--DBUILD_AUTOUPDATE=OFF \
+%cmake .. -DBUILD_AUTOUPDATE=OFF \
 -DBUILD_CRASH_REPORTER=OFF \
+-DBUILD_JACK=OFF \
+-DBUILD_LAME=OFF \
+-DBUILD_PCH=OFF \
+-DBUILD_PORTMIDI=OFF \
+-DBUILD_WEBENGINE=OFF \
+-DINSTALL_GTEST=OFF \
+-DMUE_COMPILE_USE_SYSTEM_FREETYPE=ON \
 -DQMAKE:FILEPATH=/usr/lib64/qt5/bin/qmake
 make  %{?_smp_mflags}
 popd
@@ -169,9 +165,10 @@ FFLAGS="$CLEAR_INTERMEDIATE_FFLAGS"
 FCFLAGS="$CLEAR_INTERMEDIATE_FCFLAGS"
 ASFLAGS="$CLEAR_INTERMEDIATE_ASFLAGS"
 LDFLAGS="$CLEAR_INTERMEDIATE_LDFLAGS"
-export SOURCE_DATE_EPOCH=1715962871
+export SOURCE_DATE_EPOCH=1715981261
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/MuseScore
+cp %{_builddir}/MuseScore-%{version}/LICENSE.txt %{buildroot}/usr/share/package-licenses/MuseScore/c6cdea5f044c95b68a1a36d69f81fff23474f9c1 || :
 cp %{_builddir}/MuseScore-%{version}/build/PortableApps/Other/Source/LauncherLicense.txt %{buildroot}/usr/share/package-licenses/MuseScore/358f72786c97f5a0c5b1e591230c592c55b4ca13 || :
 cp %{_builddir}/MuseScore-%{version}/build/packaging/LICENSE.rtf %{buildroot}/usr/share/package-licenses/MuseScore/d4e5c03abfb7553786ce54d884099069ba8f31d4 || :
 cp %{_builddir}/MuseScore-%{version}/buildscripts/PortableApps/Other/Source/LauncherLicense.txt %{buildroot}/usr/share/package-licenses/MuseScore/358f72786c97f5a0c5b1e591230c592c55b4ca13 || :
@@ -179,6 +176,7 @@ cp %{_builddir}/MuseScore-%{version}/buildscripts/packaging/LICENSE.rtf %{buildr
 cp %{_builddir}/MuseScore-%{version}/fonts/bravura/LICENSE.txt %{buildroot}/usr/share/package-licenses/MuseScore/6b237c2d44e8956b794b2a9385d8667e8b9edd19 || :
 cp %{_builddir}/MuseScore-%{version}/fonts/campania/LICENSE %{buildroot}/usr/share/package-licenses/MuseScore/985b1df2e313174e602dc88a90e707eaf7255c84 || :
 cp %{_builddir}/MuseScore-%{version}/fonts/edwin/LICENSE.txt %{buildroot}/usr/share/package-licenses/MuseScore/828a74dd924a6c91227253e0579f7193cae14a2a || :
+cp %{_builddir}/MuseScore-%{version}/fonts/leland/LICENSE.txt %{buildroot}/usr/share/package-licenses/MuseScore/f3e300332e94e8a9069525ab71eeebd02d2fc03c || :
 cp %{_builddir}/MuseScore-%{version}/share/wallpapers/COPYRIGHT %{buildroot}/usr/share/package-licenses/MuseScore/5a04ab8ef605c56d9f877ca3953c1b000293ea79 || :
 cp %{_builddir}/MuseScore-%{version}/src/braille/thirdparty/liblouis/COPYING %{buildroot}/usr/share/package-licenses/MuseScore/8624bcdae55baeef00cd11d5dfcfa60f68710a02 || :
 cp %{_builddir}/MuseScore-%{version}/src/braille/thirdparty/liblouis/COPYING.LESSER %{buildroot}/usr/share/package-licenses/MuseScore/01a6b4bf79aca9b556822601186afab86e8c4fbf || :
@@ -188,6 +186,7 @@ cp %{_builddir}/MuseScore-%{version}/src/framework/global/thirdparty/deto_async/
 cp %{_builddir}/MuseScore-%{version}/src/framework/global/thirdparty/kors_logger/LICENSE %{buildroot}/usr/share/package-licenses/MuseScore/f13a717b2d147919f0849d6bb9671c1176e37a2e || :
 cp %{_builddir}/MuseScore-%{version}/src/framework/global/thirdparty/kors_profiler/LICENSE %{buildroot}/usr/share/package-licenses/MuseScore/f13a717b2d147919f0849d6bb9671c1176e37a2e || :
 cp %{_builddir}/MuseScore-%{version}/src/framework/global/thirdparty/utfcpp-3.2.1/LICENSE %{buildroot}/usr/share/package-licenses/MuseScore/3cba29011be2b9d59f6204d6fa0a386b1b2dbd90 || :
+cp %{_builddir}/MuseScore-%{version}/thirdparty/KDDockWidgets/LICENSE.GPL.txt %{buildroot}/usr/share/package-licenses/MuseScore/59cc38bb6bd181744147688a463990a2b99b3ed9 || :
 cp %{_builddir}/MuseScore-%{version}/thirdparty/KDDockWidgets/LICENSES/GPL-2.0-only.txt %{buildroot}/usr/share/package-licenses/MuseScore/2a638514c87c4923c0570c55822620fad56f2a33 || :
 cp %{_builddir}/MuseScore-%{version}/thirdparty/KDDockWidgets/LICENSES/GPL-3.0-only.txt %{buildroot}/usr/share/package-licenses/MuseScore/6091db0aead0d90182b93d3c0d09ba93d188f907 || :
 cp %{_builddir}/MuseScore-%{version}/thirdparty/beatroot/COPYING %{buildroot}/usr/share/package-licenses/MuseScore/06877624ea5c77efe3b7e39b0f909eda6e25a4ec || :
@@ -211,13 +210,23 @@ GOAMD64=v2
 pushd clr-build
 %make_install
 popd
+## install_append content
+# Don't install extraneous stuff that belongs to other projects
+rm -rf %{buildroot}/usr/include/gmock
+rm -rf %{buildroot}/usr/include/gtest
+rm -rf %{buildroot}/usr/include/kddockwidgets
+rm -rf %{buildroot}/usr/include/opus
+rm -rf %{buildroot}/usr/lib64/cmake/GTest
+rm -rf %{buildroot}/usr/lib64/cmake/KDDockWidgets
+rm -rf %{buildroot}/usr/lib64/pkgconfig/gmock*
+rm -rf %{buildroot}/usr/lib64/pkgconfig/gtest*
+## install_append end
 
 %files
 %defattr(-,root,root,-)
 
 %files bin
 %defattr(-,root,root,-)
-/usr/bin/crashpad_handler
 /usr/bin/mscore
 
 %files data
@@ -1123,102 +1132,6 @@ popd
 /usr/share/mscore-4.3/wallpapers/paper6.png
 /usr/share/mscore-4.3/wallpapers/paper7.png
 
-%files dev
-%defattr(-,root,root,-)
-/usr/include/gmock/gmock-actions.h
-/usr/include/gmock/gmock-cardinalities.h
-/usr/include/gmock/gmock-function-mocker.h
-/usr/include/gmock/gmock-matchers.h
-/usr/include/gmock/gmock-more-actions.h
-/usr/include/gmock/gmock-more-matchers.h
-/usr/include/gmock/gmock-nice-strict.h
-/usr/include/gmock/gmock-spec-builders.h
-/usr/include/gmock/gmock.h
-/usr/include/gmock/internal/custom/README.md
-/usr/include/gmock/internal/custom/gmock-generated-actions.h
-/usr/include/gmock/internal/custom/gmock-matchers.h
-/usr/include/gmock/internal/custom/gmock-port.h
-/usr/include/gmock/internal/gmock-internal-utils.h
-/usr/include/gmock/internal/gmock-port.h
-/usr/include/gmock/internal/gmock-pp.h
-/usr/include/gtest/gtest-death-test.h
-/usr/include/gtest/gtest-matchers.h
-/usr/include/gtest/gtest-message.h
-/usr/include/gtest/gtest-param-test.h
-/usr/include/gtest/gtest-printers.h
-/usr/include/gtest/gtest-spi.h
-/usr/include/gtest/gtest-test-part.h
-/usr/include/gtest/gtest-typed-test.h
-/usr/include/gtest/gtest.h
-/usr/include/gtest/gtest_pred_impl.h
-/usr/include/gtest/gtest_prod.h
-/usr/include/gtest/internal/custom/README.md
-/usr/include/gtest/internal/custom/gtest-port.h
-/usr/include/gtest/internal/custom/gtest-printers.h
-/usr/include/gtest/internal/custom/gtest.h
-/usr/include/gtest/internal/gtest-death-test-internal.h
-/usr/include/gtest/internal/gtest-filepath.h
-/usr/include/gtest/internal/gtest-internal.h
-/usr/include/gtest/internal/gtest-param-util.h
-/usr/include/gtest/internal/gtest-port-arch.h
-/usr/include/gtest/internal/gtest-port.h
-/usr/include/gtest/internal/gtest-string.h
-/usr/include/gtest/internal/gtest-type-util.h
-/usr/include/kddockwidgets/Config.h
-/usr/include/kddockwidgets/DockWidgetBase.h
-/usr/include/kddockwidgets/DockWidgetQuick.h
-/usr/include/kddockwidgets/FocusScope.h
-/usr/include/kddockwidgets/FrameworkWidgetFactory.h
-/usr/include/kddockwidgets/KDDockWidgets.h
-/usr/include/kddockwidgets/LayoutSaver.h
-/usr/include/kddockwidgets/MainWindowBase.h
-/usr/include/kddockwidgets/MainWindowMDI.h
-/usr/include/kddockwidgets/QWidgetAdapter.h
-/usr/include/kddockwidgets/Qt5Qt6Compat_p.h
-/usr/include/kddockwidgets/docks_export.h
-/usr/include/kddockwidgets/kddockwidgets_version.h
-/usr/include/kddockwidgets/private/DockRegistry_p.h
-/usr/include/kddockwidgets/private/DragController_p.h
-/usr/include/kddockwidgets/private/Draggable_p.h
-/usr/include/kddockwidgets/private/DropArea_p.h
-/usr/include/kddockwidgets/private/DropIndicatorOverlayInterface_p.h
-/usr/include/kddockwidgets/private/FloatingWindow_p.h
-/usr/include/kddockwidgets/private/Frame_p.h
-/usr/include/kddockwidgets/private/LayoutSaver_p.h
-/usr/include/kddockwidgets/private/LayoutWidget_p.h
-/usr/include/kddockwidgets/private/MultiSplitter_p.h
-/usr/include/kddockwidgets/private/SideBar_p.h
-/usr/include/kddockwidgets/private/TabWidget_p.h
-/usr/include/kddockwidgets/private/TitleBar_p.h
-/usr/include/kddockwidgets/private/WidgetResizeHandler_p.h
-/usr/include/kddockwidgets/private/WindowBeingDragged_p.h
-/usr/include/kddockwidgets/private/indicators/ClassicIndicators_p.h
-/usr/include/kddockwidgets/private/indicators/SegmentedIndicators_p.h
-/usr/include/kddockwidgets/private/multisplitter/Item_p.h
-/usr/include/kddockwidgets/private/multisplitter/Separator_p.h
-/usr/include/kddockwidgets/private/multisplitter/Separator_quick.h
-/usr/include/kddockwidgets/private/multisplitter/Widget.h
-/usr/include/kddockwidgets/private/multisplitter/Widget_quick.h
-/usr/include/kddockwidgets/private/quick/QWidgetAdapter_quick_p.h
-/usr/include/opus/opus.h
-/usr/include/opus/opus_custom.h
-/usr/include/opus/opus_defines.h
-/usr/include/opus/opus_multistream.h
-/usr/include/opus/opus_projection.h
-/usr/include/opus/opus_types.h
-/usr/lib64/cmake/GTest/GTestConfig.cmake
-/usr/lib64/cmake/GTest/GTestConfigVersion.cmake
-/usr/lib64/cmake/GTest/GTestTargets-relwithdebinfo.cmake
-/usr/lib64/cmake/GTest/GTestTargets.cmake
-/usr/lib64/cmake/KDDockWidgets/KDDockWidgetsConfig.cmake
-/usr/lib64/cmake/KDDockWidgets/KDDockWidgetsConfigVersion.cmake
-/usr/lib64/cmake/KDDockWidgets/KDDockWidgetsTargets-relwithdebinfo.cmake
-/usr/lib64/cmake/KDDockWidgets/KDDockWidgetsTargets.cmake
-/usr/lib64/pkgconfig/gmock.pc
-/usr/lib64/pkgconfig/gmock_main.pc
-/usr/lib64/pkgconfig/gtest.pc
-/usr/lib64/pkgconfig/gtest_main.pc
-
 %files license
 %defattr(0644,root,root,0755)
 /usr/share/package-licenses/MuseScore/01a6b4bf79aca9b556822601186afab86e8c4fbf
@@ -1231,6 +1144,7 @@ popd
 /usr/share/package-licenses/MuseScore/358f72786c97f5a0c5b1e591230c592c55b4ca13
 /usr/share/package-licenses/MuseScore/3cba29011be2b9d59f6204d6fa0a386b1b2dbd90
 /usr/share/package-licenses/MuseScore/4cc77b90af91e615a64ae04893fdffa7939db84c
+/usr/share/package-licenses/MuseScore/59cc38bb6bd181744147688a463990a2b99b3ed9
 /usr/share/package-licenses/MuseScore/5a04ab8ef605c56d9f877ca3953c1b000293ea79
 /usr/share/package-licenses/MuseScore/5a2314153eadadc69258a9429104cd11804ea304
 /usr/share/package-licenses/MuseScore/6091db0aead0d90182b93d3c0d09ba93d188f907
@@ -1243,6 +1157,7 @@ popd
 /usr/share/package-licenses/MuseScore/985b1df2e313174e602dc88a90e707eaf7255c84
 /usr/share/package-licenses/MuseScore/ae157c440dbbaa3bd959f20bbb07d37fe120ee23
 /usr/share/package-licenses/MuseScore/bd75d59f9d7d9731bfabdc48ecd19e704d218e38
+/usr/share/package-licenses/MuseScore/c6cdea5f044c95b68a1a36d69f81fff23474f9c1
 /usr/share/package-licenses/MuseScore/caeb68c46fa36651acf592771d09de7937926bb3
 /usr/share/package-licenses/MuseScore/d4e5c03abfb7553786ce54d884099069ba8f31d4
 /usr/share/package-licenses/MuseScore/dac7127c82749e3107b53530289e1cd548860868
@@ -1250,6 +1165,7 @@ popd
 /usr/share/package-licenses/MuseScore/e60c2e780886f95df9c9ee36992b8edabec00bcc
 /usr/share/package-licenses/MuseScore/eca38fa1e18e17f07a86cca714336c565ecbfe70
 /usr/share/package-licenses/MuseScore/f13a717b2d147919f0849d6bb9671c1176e37a2e
+/usr/share/package-licenses/MuseScore/f3e300332e94e8a9069525ab71eeebd02d2fc03c
 /usr/share/package-licenses/MuseScore/f63d4e18fb18c853ad20439b07536d5447ff2864
 
 %files man

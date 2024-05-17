@@ -1,0 +1,9 @@
+# Don't install extraneous stuff that belongs to other projects
+rm -rf %{buildroot}/usr/include/gmock
+rm -rf %{buildroot}/usr/include/gtest
+rm -rf %{buildroot}/usr/include/kddockwidgets
+rm -rf %{buildroot}/usr/include/opus
+rm -rf %{buildroot}/usr/lib64/cmake/GTest
+rm -rf %{buildroot}/usr/lib64/cmake/KDDockWidgets
+rm -rf %{buildroot}/usr/lib64/pkgconfig/gmock*
+rm -rf %{buildroot}/usr/lib64/pkgconfig/gtest*
