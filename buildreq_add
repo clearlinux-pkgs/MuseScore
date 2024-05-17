@@ -2,6 +2,7 @@
 # picked up automatically. One name per line, no whitespace.
 libsndfile-dev
 libvorbis-dev
+qtbase-lib
 qtsvg-dev
 qttools-dev
 qtwebengine-dev
