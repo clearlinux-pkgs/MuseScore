@@ -1,1 +1,2 @@
 Cannot resolve dependency name: pkgconfig(libopusenc)
+Cannot resolve dependency name: pkgconfig(tinyxml2)
