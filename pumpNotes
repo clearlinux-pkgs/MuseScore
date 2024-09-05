@@ -1,1 +1,0 @@
-4.4.0 build fails due to third-party dependency cruft in cmake: https://github.com/musescore/MuseScore/issues/24235
