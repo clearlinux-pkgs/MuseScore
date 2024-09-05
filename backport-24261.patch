@@ -1,0 +1,163 @@
+From 696279e362afe72db5e92f8a47aa64b3a0e86a86 Mon Sep 17 00:00:00 2001
+From: Casper Jeukendrup <48658420+cbjeukendrup@users.noreply.github.com>
+Date: Wed, 28 Aug 2024 14:48:27 +0200
+Subject: [PATCH] Support building with system harfbuzz
+
+Those who want this, and accept the risk of incompatibilities, can enable it using `-D MUE_COMPILE_USE_SYSTEM_HARFBUZZ=ON`
+---
+ CMakeLists.txt                               |  1 +
+ src/framework/draw/CMakeLists.txt            | 39 ++---------
+ src/framework/draw/cmake/SetupHarfBuzz.cmake | 68 ++++++++++++++++++++
+ src/framework/draw/internal/fontfaceft.cpp   |  1 -
+ 4 files changed, 73 insertions(+), 36 deletions(-)
+ create mode 100644 src/framework/draw/cmake/SetupHarfBuzz.cmake
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1c89929fac699..397f7b7c39b8e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -103,6 +103,7 @@ option(MUE_COMPILE_MACOS_PRECOMPILED_DEPS_PATH "Path to precompiled dependencies
+ # Important for the maintainers of Linux distributions
+ option(MUE_COMPILE_USE_SYSTEM_FLAC "Try use system flac" OFF)
+ option(MUE_COMPILE_USE_SYSTEM_FREETYPE "Try use system freetype" OFF)
++option(MUE_COMPILE_USE_SYSTEM_HARFBUZZ "Try use system harfbuzz" OFF)
+ option(MUE_COMPILE_USE_SYSTEM_OPUS "Try use system opus" OFF)
+ option(MUE_COMPILE_USE_SYSTEM_OPUSENC "Try use system libopusenc" OFF)
+ option(MUE_COMPILE_USE_SYSTEM_TINYXML "Try use system tinyxml" OFF)
+diff --git a/src/framework/draw/CMakeLists.txt b/src/framework/draw/CMakeLists.txt
+index 96009e63f0e1..a267ad7768d8 100644
+--- a/src/framework/draw/CMakeLists.txt
++++ b/src/framework/draw/CMakeLists.txt
+@@ -107,42 +107,13 @@ else()
+     )
+ 
+     include(cmake/SetupFreeType.cmake)
+-
+-    # add harfbuzz
+-    # in the future this needs to be moved to some function in a separate file
+-    set(REMOTE_ROOT_URL https://raw.githubusercontent.com/musescore/muse_deps/main)
+-    set(remote_url ${REMOTE_ROOT_URL}/harfbuzz/7.1.0)
+-    set(local_path ${CMAKE_CURRENT_LIST_DIR}/_deps/harfbuzz)
+-    if (NOT EXISTS ${local_path}/harfbuzz.cmake)
+-        file(MAKE_DIRECTORY ${local_path})
+-        file(DOWNLOAD ${remote_url}/harfbuzz.cmake ${local_path}/harfbuzz.cmake
+-            HTTPHEADER "Cache-Control: no-cache"
+-        )
+-    endif()
+-
+-    include(${local_path}/harfbuzz.cmake)
+-
+-    # func from ${name}.cmake)
+-    cmake_language(CALL harfbuzz_Populate ${remote_url} ${local_path} "source" "" "")
+-
+-    add_subdirectory(_deps/harfbuzz/harfbuzz)
+-    target_no_warning(harfbuzz -Wno-conversion)
+-    target_no_warning(harfbuzz -Wno-unused-parameter)
+-    target_no_warning(harfbuzz -Wno-unused-variable)
+-    target_no_warning(harfbuzz -WMSVC-no-hides-previous)
+-    target_no_warning(harfbuzz -WMSVC-no-unreachable)
+-
+-    #add_subdirectory(thirdparty/msdfgen)
+-
+-    set(MODULE_INCLUDE
+-        ${FREETYPE_INCLUDE_DIRS}
+-        ${CMAKE_CURRENT_LIST_DIR}/_deps/harfbuzz/harfbuzz/harfbuzz/src
+-        #${CMAKE_CURRENT_LIST_DIR}/thirdparty/msdfgen/msdfgen-1.4
+-    )
++    include(cmake/SetupHarfBuzz.cmake)
+ 
+     set(MODULE_DEF ${MODULE_DEF} -DMUSE_MODULE_DRAW_USE_QTTEXTDRAW)
+ 
+-    set(MODULE_LINK ${FREETYPE_LIBRARIES} harfbuzz )#msdfgen)
++    set(MODULE_LINK ${FREETYPE_LIBRARIES} ${HARFBUZZ_LIBRARIES} )#msdfgen)
++
++    set(MODULE_INCLUDE ${FREETYPE_INCLUDE_DIRS} ${HARFBUZZ_INCLUDE_DIRS} )#${MSDFGEN_INCLUDE_DIRS})
+ 
+ endif()
+ 
+diff --git a/src/framework/draw/cmake/SetupHarfBuzz.cmake b/src/framework/draw/cmake/SetupHarfBuzz.cmake
+new file mode 100644
+index 0000000000000..700fec33bc574
+--- /dev/null
++++ b/src/framework/draw/cmake/SetupHarfBuzz.cmake
+@@ -0,0 +1,68 @@
++# SPDX-License-Identifier: GPL-3.0-only
++# MuseScore-CLA-applies
++#
++# MuseScore
++# Music Composition & Notation
++#
++# Copyright (C) 2024 MuseScore Limited
++#
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License version 3 as
++# published by the Free Software Foundation.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <https://www.gnu.org/licenses/>.
++
++if (MUE_COMPILE_USE_SYSTEM_HARFBUZZ)
++    find_package(HarfBuzz)
++
++    if (HarfBuzz_FOUND)
++        message(STATUS "Found HarfBuzz")
++
++        # See HarfBuzz's harfbuzz-config.cmake, which is quite minimalistic
++        set(HARFBUZZ_LIBRARIES harfbuzz::harfbuzz)
++        set(HARFBUZZ_INCLUDE_DIRS ${HARFBUZZ_INCLUDE_DIR})
++
++        return()
++    else()
++        message(WARNING "Set MUE_COMPILE_USE_SYSTEM_HARFBUZZ=ON, but system harfbuzz not found, built-in will be used")
++    endif()
++endif()
++
++# If not MUE_COMPILE_USE_SYSTEM_HARFBUZZ, or if it was not found,
++# download and build harfbuzz
++
++set(REMOTE_ROOT_URL https://raw.githubusercontent.com/musescore/muse_deps/main)
++set(remote_url ${REMOTE_ROOT_URL}/harfbuzz/7.1.0)
++set(local_path ${CMAKE_CURRENT_LIST_DIR}/../_deps/harfbuzz)
++if (NOT EXISTS ${local_path}/harfbuzz.cmake)
++    file(MAKE_DIRECTORY ${local_path})
++    file(DOWNLOAD ${remote_url}/harfbuzz.cmake ${local_path}/harfbuzz.cmake
++        HTTPHEADER "Cache-Control: no-cache"
++    )
++endif()
++
++include(${local_path}/harfbuzz.cmake)
++
++# func from ${name}.cmake)
++cmake_language(CALL harfbuzz_Populate ${remote_url} ${local_path} "source" "" "")
++
++set(HB_HAVE_FREETYPE ON)
++
++add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../_deps/harfbuzz/harfbuzz harfbuzz)
++
++target_no_warning(harfbuzz -Wno-conversion)
++target_no_warning(harfbuzz -Wno-unused-parameter)
++target_no_warning(harfbuzz -Wno-unused-variable)
++target_no_warning(harfbuzz -WMSVC-no-hides-previous)
++target_no_warning(harfbuzz -WMSVC-no-unreachable)
++
++#add_subdirectory(thirdparty/msdfgen)
++
++set(HARFBUZZ_LIBRARIES harfbuzz)
++set(HARFBUZZ_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/../_deps/harfbuzz/harfbuzz/harfbuzz/src)
+diff --git a/src/framework/draw/internal/fontfaceft.cpp b/src/framework/draw/internal/fontfaceft.cpp
+index 447e384be6b8a..c88c4153cd644 100644
+--- a/src/framework/draw/internal/fontfaceft.cpp
++++ b/src/framework/draw/internal/fontfaceft.cpp
+@@ -22,7 +22,6 @@
+ #include "fontfaceft.h"
+ 
+ #include <unordered_map>
+-#include <iostream>
+ 
+ #include <ft2build.h>
+ #include FT_FREETYPE_H

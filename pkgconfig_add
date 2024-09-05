@@ -1,6 +1,6 @@
 # This file contains additional pkgconfig build requirements that did
 # not get picked up automatically. One name per line, no whitespace.
-Qt5QuickControls2
-Qt5QuickTemplates2
+Qt6QuickControls2
+Qt6QuickTemplates2
 alsa
 portaudio-2.0

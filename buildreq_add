@@ -1,10 +1,13 @@
 # This file contains additional build requirements that did not get
 # picked up automatically. One name per line, no whitespace.
 googletest-dev
+libopusenc-dev
 libsndfile-dev
 libvorbis-dev
-qtbase-lib
-qtsvg-dev
-qttools-dev
-qtwebengine-dev
-qtxmlpatterns-dev
+qt5compat-dev
+qt6base-dev
+qt6networkauth-dev
+qt6scxml-dev
+qt6svg-dev
+qt6tools-dev
+qt6webengine-dev

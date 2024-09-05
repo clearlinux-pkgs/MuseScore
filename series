@@ -1,2 +1,1 @@
-#0001-Fix-build-when-lame-is-disabled.patch
-0001-Don-t-install-the-crashpad_handler.patch
+backport-24261.patch
