@@ -7,7 +7,7 @@
 #
 Name     : MuseScore
 Version  : 4.4.0
-Release  : 20
+Release  : 21
 URL      : https://github.com/musescore/MuseScore/archive/v4.4.0/MuseScore-4.4.0.tar.gz
 Source0  : https://github.com/musescore/MuseScore/archive/v4.4.0/MuseScore-4.4.0.tar.gz
 Summary  : Shared and static libraries for LAME.
@@ -83,18 +83,6 @@ Group: Data
 data components for the MuseScore package.
 
 
-%package dev
-Summary: dev components for the MuseScore package.
-Group: Development
-Requires: MuseScore-bin = %{version}-%{release}
-Requires: MuseScore-data = %{version}-%{release}
-Provides: MuseScore-devel = %{version}-%{release}
-Requires: MuseScore = %{version}-%{release}
-
-%description dev
-dev components for the MuseScore package.
-
-
 %package license
 Summary: license components for the MuseScore package.
 Group: Default
@@ -125,7 +113,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1725496001
+export SOURCE_DATE_EPOCH=1725499100
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -181,7 +169,7 @@ FFLAGS="$CLEAR_INTERMEDIATE_FFLAGS"
 FCFLAGS="$CLEAR_INTERMEDIATE_FCFLAGS"
 ASFLAGS="$CLEAR_INTERMEDIATE_ASFLAGS"
 LDFLAGS="$CLEAR_INTERMEDIATE_LDFLAGS"
-export SOURCE_DATE_EPOCH=1725496001
+export SOURCE_DATE_EPOCH=1725499100
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/MuseScore
 cp %{_builddir}/MuseScore-%{version}/buildscripts/packaging/Windows/Installer/LICENSE.rtf %{buildroot}/usr/share/package-licenses/MuseScore/2c9d95d6aedfc3f4ea5ba9e411c44245484f9882 || :
@@ -224,6 +212,47 @@ GOAMD64=v2
 pushd clr-build
 %make_install
 popd
+## Remove excluded files
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/Config.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/DockWidgetBase.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/DockWidgetQuick.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/FocusScope.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/FrameworkWidgetFactory.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/KDDockWidgets.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/LayoutSaver.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/MainWindowBase.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/MainWindowMDI.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/QWidgetAdapter.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/Qt5Qt6Compat_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/docks_export.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/kddockwidgets_version.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/DockRegistry_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/DragController_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/Draggable_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/DropArea_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/DropIndicatorOverlayInterface_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/FloatingWindow_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/Frame_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/LayoutSaver_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/LayoutWidget_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/MultiSplitter_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/SideBar_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/TabWidget_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/TitleBar_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/WidgetResizeHandler_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/WindowBeingDragged_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/indicators/ClassicIndicators_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/indicators/SegmentedIndicators_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/multisplitter/Item_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/multisplitter/Separator_p.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/multisplitter/Separator_quick.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/multisplitter/Widget.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/multisplitter/Widget_quick.h
+rm -f %{buildroot}*/usr/include/kddockwidgets-qt6/kddockwidgets/private/quick/QWidgetAdapter_quick_p.h
+rm -f %{buildroot}*/usr/lib64/cmake/KDDockWidgets-qt6/KDDockWidgets-qt6Config.cmake
+rm -f %{buildroot}*/usr/lib64/cmake/KDDockWidgets-qt6/KDDockWidgets-qt6ConfigVersion.cmake
+rm -f %{buildroot}*/usr/lib64/cmake/KDDockWidgets-qt6/KDDockWidgets-qt6Targets-relwithdebinfo.cmake
+rm -f %{buildroot}*/usr/lib64/cmake/KDDockWidgets-qt6/KDDockWidgets-qt6Targets.cmake
 ## install_append content
 # Don't install extraneous stuff that belongs to other projects
 rm -rf %{buildroot}/usr/include/gmock
@@ -1165,49 +1194,6 @@ rm -rf %{buildroot}/usr/lib64/pkgconfig/gtest*
 /usr/share/mscore-4.4/wallpapers/paper5.png
 /usr/share/mscore-4.4/wallpapers/paper6.png
 /usr/share/mscore-4.4/wallpapers/paper7.png
-
-%files dev
-%defattr(-,root,root,-)
-/usr/include/kddockwidgets-qt6/kddockwidgets/Config.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/DockWidgetBase.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/DockWidgetQuick.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/FocusScope.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/FrameworkWidgetFactory.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/KDDockWidgets.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/LayoutSaver.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/MainWindowBase.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/MainWindowMDI.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/QWidgetAdapter.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/Qt5Qt6Compat_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/docks_export.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/kddockwidgets_version.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/DockRegistry_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/DragController_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/Draggable_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/DropArea_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/DropIndicatorOverlayInterface_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/FloatingWindow_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/Frame_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/LayoutSaver_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/LayoutWidget_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/MultiSplitter_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/SideBar_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/TabWidget_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/TitleBar_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/WidgetResizeHandler_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/WindowBeingDragged_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/indicators/ClassicIndicators_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/indicators/SegmentedIndicators_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/multisplitter/Item_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/multisplitter/Separator_p.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/multisplitter/Separator_quick.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/multisplitter/Widget.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/multisplitter/Widget_quick.h
-/usr/include/kddockwidgets-qt6/kddockwidgets/private/quick/QWidgetAdapter_quick_p.h
-/usr/lib64/cmake/KDDockWidgets-qt6/KDDockWidgets-qt6Config.cmake
-/usr/lib64/cmake/KDDockWidgets-qt6/KDDockWidgets-qt6ConfigVersion.cmake
-/usr/lib64/cmake/KDDockWidgets-qt6/KDDockWidgets-qt6Targets-relwithdebinfo.cmake
-/usr/lib64/cmake/KDDockWidgets-qt6/KDDockWidgets-qt6Targets.cmake
 
 %files license
 %defattr(0644,root,root,0755)
