@@ -7,7 +7,7 @@
 #
 Name     : MuseScore
 Version  : 4.4.0
-Release  : 23
+Release  : 24
 URL      : https://github.com/musescore/MuseScore/archive/v4.4.0/MuseScore-4.4.0.tar.gz
 Source0  : https://github.com/musescore/MuseScore/archive/v4.4.0/MuseScore-4.4.0.tar.gz
 Summary  : Shared and static libraries for LAME.
